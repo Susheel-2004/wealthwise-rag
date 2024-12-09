@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Emulator</title>
+</head>
+<body>
+    <h1>LLM Emulator</h1>
+    <form id="queryForm">
+        <textarea id="queryInput" placeholder="Enter your query here..."></textarea>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="responseArea">Response will appear here...</div>
+
+    <script>
+        document.getElementById('queryForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting in the traditional way
+            const query = document.getElementById('queryInput').value;
+            fetch('/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ "question" : query }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('responseArea').textContent = data.response;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('responseArea').textContent = 'Error processing your query.';
+            });
+        });
+    </script>
+</body>
+</html>

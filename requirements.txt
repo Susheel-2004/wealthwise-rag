@@ -1,0 +1,9 @@
+langchain
+langchain_community
+chromadb # Vector storage
+pytest
+boto3
+Flask
+pypdf
+requests
+pandas
