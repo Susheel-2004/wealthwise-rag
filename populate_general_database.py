@@ -3,9 +3,9 @@ import os
 import shutil
 from langchain_community.document_loaders import TextLoader, PyPDFDirectoryLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.schema.document import Document
+from langchain_core.documents import Document
 from get_embedding_function import get_embedding_function
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from pypdf.errors import PdfStreamError
 from random import randint
 
@@ -18,11 +18,11 @@ def main():
     # clear_database()
 
     documents = load_documents()
-    pdfs = load_pdf()
+    pdfdocs = load_pdf()
     chunks = split_documents(documents)
-    pdf_chunks = split_documents(pdfs)
+    pdfchunks = split_documents(pdfdocs)
     add_to_chroma(chunks)
-    add_to_chroma(pdf_chunks)
+    add_to_chroma(pdfchunks)
 
 
 
@@ -40,7 +40,7 @@ def load_pdf():
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
+        chunk_size=1000,
         chunk_overlap=80,
         length_function=len,
         is_separator_regex=False,
@@ -51,7 +51,8 @@ def split_documents(documents: list[Document]):
 def add_to_chroma(chunks: list[Document]):
     # Load the existing database.
     db = Chroma(
-        persist_directory=CHROMA_PATH, embedding_function=get_embedding_function()
+        persist_directory=CHROMA_PATH,
+        embedding_function=get_embedding_function()
     )
 
     # Calculate Page IDs.
@@ -73,13 +74,15 @@ def add_to_chroma(chunks: list[Document]):
         new_chunk_ids = [chunk.metadata["id"] for chunk in new_chunks]
         try:
             db.add_documents(new_chunks, ids=new_chunk_ids)
+            db.persist()
+            print(f"Documents successfully added")
         except PdfStreamError as e:  # Catching PdfStreamError specifically
             print(f"🚨 Error adding documents to the database: {e}")
         # Optionally, log the ID of the chunk or file causing the error
             print(f"Skipping file due to error: {new_chunk_ids}")
         except Exception as e:  # Catching any other exceptions
             print(f"🚨 An unexpected error occurred: {e}")
-        db.persist()
+            
     else:
         print("✅ No new documents to add")
 

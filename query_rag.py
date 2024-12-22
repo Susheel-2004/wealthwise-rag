@@ -1,6 +1,6 @@
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
-from langchain_community.llms.ollama import Ollama
+from langchain_ollama import OllamaLLM
 from get_embedding_function import get_embedding_function
 import textwrap
 
@@ -10,8 +10,10 @@ CHROMA_PATH = "chroma"
 
 NEW_PROMPT_TEMPLATE = """
 
+
 {context}
 ---
+answer questions related to the context given.
 
 Question: {question}
 
@@ -37,12 +39,13 @@ def query_rag(query_text: str):
     # print("Search complete.")
 
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
+    print(context_text)
     prompt_template = ChatPromptTemplate.from_template(NEW_PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=query_text)
     # print("Prompt ready.")
     
 
-    model = Ollama(model="llama3.1:8b")
+    model = OllamaLLM(model="llama3.1:8b")
     # print("Model ready.")
     response_text = model.invoke(prompt)
     # print("Response ready.")
@@ -51,4 +54,10 @@ def query_rag(query_text: str):
     formatted_response = f"{response_text}\n"
 
     return formatted_response
+
+def main():
+    print(query_rag("top 20 common investment mistakes"))
+
+if __name__ == "__main__":
+    main()
 
