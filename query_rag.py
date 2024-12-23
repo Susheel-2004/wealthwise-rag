@@ -33,11 +33,60 @@ If there are no spendings at all, encourage use of our budgeting feature to trac
 """
 
 NEW_PROMPT_TEMPLATE = """
+user: what is a mutual fund?
+you said:
 
+
+A mutual fund is a professionally managed investment vehicle that pools money from multiple investors to purchase a diversified portfolio of securities such as stocks, bonds, money market instruments, or other assets. Each investor in a mutual fund owns shares, which represent a portion of the fund's holdings.
+Key Features of a Mutual Fund:
+
+    Diversification:
+        Mutual funds invest in a variety of assets to reduce risk. Instead of putting all your money in one stock or bond, mutual funds spread investments across multiple assets.
+
+    Professional Management:
+        Managed by fund managers or financial experts who make decisions on what securities to buy, hold, or sell, based on the fund's objectives.
+
+    Pooling of Resources:
+        Investors collectively pool their money, allowing individuals with smaller amounts to access diversified portfolios and professional management.
+
+    Types of Mutual Funds:
+        Equity Funds: Invest primarily in stocks, suitable for long-term growth.
+        Debt Funds: Focus on fixed-income securities like bonds, offering stable returns with lower risk.
+        Balanced or Hybrid Funds: Invest in a mix of stocks and bonds to balance risk and reward.
+        Index Funds: Aim to replicate the performance of a specific index (e.g., S&P 500).
+        Money Market Funds: Invest in short-term, low-risk securities for liquidity and safety.
+
+    Net Asset Value (NAV):
+        The price per share of a mutual fund, calculated daily based on the total value of the fund's assets minus its liabilities, divided by the number of outstanding shares.
+
+    Liquidity:
+        Most mutual funds offer liquidity, allowing investors to buy or sell shares at the fund's NAV on any business day.
+
+    Fees:
+        Mutual funds charge fees like expense ratios (for management and operations) and sometimes sales loads (commissions for buying or selling shares).
+
+Advantages of Mutual Funds:
+
+    Access to Professional Management: Ideal for investors with limited expertise or time.
+    Diversification: Reduces the impact of poor performance by a single asset.
+    Affordability: Investors can start with small amounts.
+    Liquidity: Easy to buy and sell shares.
+    Regulation: Mutual funds are typically regulated by government bodies (e.g., SEC in the U.S.), ensuring transparency and investor protection.
+
+Disadvantages of Mutual Funds:
+
+    Fees and Expenses: Management fees and other costs can eat into returns.
+    No Control Over Portfolio: Investors rely on fund managers to make decisions.
+    Market Risk: Returns are not guaranteed and depend on market performance.
+    Tax Inefficiency: Investors may incur tax liabilities when fund managers buy or sell securities.
+
+Example:
+
+If 1,000 people each invest $1,000 in a mutual fund, the fund pools $1 million. The fund manager then uses this money to buy a diversified set of securities. If the securities perform well, the fund's value increases, and investors benefit in proportion to their share.
 
 {context}
 ---
-Answer based on the context and use your own knowledge as well to answer the question.
+Answer based on the context available and also use your own knowledge to answer the question professionally and learner-friendly. And most importantly, all answers must be in the context of Indian financial market.
 
 Question: {question}
 
@@ -70,15 +119,13 @@ def query_rag(query_text: str):
     prompt_template = ChatPromptTemplate.from_template(NEW_PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=query_text)
     # print("Prompt ready.")
-    
+    # response = get_from_gemini(prompt)
+    response = get_from_llama(prompt)
 
-    model = OllamaLLM(model=MODEL)
-    # print("Model ready.")
-    response_text = model.invoke(prompt)
     # print("Response ready.")
 
     sources = [doc.metadata.get("id", None) for doc, _score in results]
-    formatted_response = f"{response_text}\n"
+    formatted_response = f"{response}\n"
 
     return formatted_response
 
@@ -129,15 +176,20 @@ def make_summary(user_id, dbc):
             """
     prompt_template = ChatPromptTemplate.from_template(SUMMARY_TEMPLATE)
     prompt = prompt_template.format(name=name, spendings=spendings, budget=budget)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    # model = OllamaLLM(model=MODEL)
-    response = model.generate_content(prompt)
-    # response  = model.invoke(prompt)
+    response = get_from_gemini(prompt)
+    #response = get_from_llama(prompt)
 
-    # return f"{response}\n"
+    return response
+
+def get_from_gemini(prompt):
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt)
     return response.text
 
-
+def get_from_llama(prompt):
+    model = OllamaLLM(model=MODEL)
+    response = model.invoke(prompt)
+    return response
 
 
 
