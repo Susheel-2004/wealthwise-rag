@@ -17,7 +17,7 @@ CORS(app)
 def home():
     return render_template('index.html')
 
-@app.route("/query", methods=['POST'])
+@app.route("/llm/query", methods=['POST'])
 def user_query():
     data = request.get_json()
     query_text = data['question']
@@ -27,15 +27,13 @@ def user_query():
     return response_object
 
 
-@app.route("/llm/summary", methods=["POST"])
-def get_summary():
-    body = request.get_json()
-    print(body)
-    user_id = body["user_id"]
-    response = make_summary(user_id, dbc)
-    response_object = make_response(jsonify({"response" : response}))
-    response_object.status_code = 200
-    return response_object
+@app.route("/llm/summary/<user_id>", methods=["GET"])
+def get_summary(user_id):
+    if request.method == "GET":
+        response = make_summary(user_id, dbc)
+        response_object = make_response(jsonify({"response" : response}))
+        response_object.status_code = 200
+        return response_object
 
 
 @app.route("/populate", methods=['POST'])

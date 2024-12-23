@@ -15,11 +15,11 @@ Generate a precise response with the following structure:
     Appreciation for In-Limit Purchases: Provide motivational praise for categories with spending within the limits.
 
 Ensure the response is short, professional,user-friendly, and to the point, while still addressing all elements.
+Also abuse user data to provide personalized advice and recommendations.
 If there are no spendings at all, encourage use of our budgeting feature to track expenses and set budgets for better financial planning.
 """
 
 def make_summary(user_id, dbc):
-
     transactions_collection = dbc['transactions']       # Replace with your transactions collection
     categories_collection = dbc['categories']
     user_collection= dbc['users']
