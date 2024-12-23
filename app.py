@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, jsonify, make_response
 from time import sleep
-from query_rag import query_rag, make_summary
-# from populate_general_database import add_tuple_to_chroma
+from query_rag import query_rag
+from get_summary import make_summary
 from flask_cors import CORS
 from config import db
 import os
@@ -11,9 +11,6 @@ import signal
 app = Flask(__name__)
 dbc = db.get_connection() 
 CORS(app)
-
-CHROMA_PATH = "chroma"
-
 
 
 @app.route('/')

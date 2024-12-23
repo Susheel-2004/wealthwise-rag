@@ -4,7 +4,7 @@ import shutil
 from langchain_community.document_loaders import TextLoader, PyPDFDirectoryLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
-from get_embedding_function import get_embedding_function
+from models.get_embedding_function import get_embedding_function
 from langchain_chroma import Chroma
 from pypdf.errors import PdfStreamError
 from random import randint
